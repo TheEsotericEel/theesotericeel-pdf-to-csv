@@ -1,43 +1,55 @@
 export default class TablePreview {
-  constructor({ data, onDataChange }) {
-    this.data = data;
-    this.onDataChange = onDataChange;
+  constructor() {
+    this.data = [];
+    this.headers = [];
+
     this.container = document.createElement('div');
+    this.container.id = 'table-preview';
+    this.container.className = 'overflow-x-auto mt-4';
+
+    const app = document.getElementById('app');
+    app.appendChild(this.container);
+  }
+
+  setData(data, headers) {
+    this.data = data;
+    this.headers = headers;
     this.render();
   }
 
   render() {
-    // Clear previous
-    this.container.innerHTML = '';
+    this.container.innerHTML = ''; // Clear previous contents
+
+    // Safeguard against undefined data/headers
+    if (!this.data || !this.headers) return;
+
     const table = document.createElement('table');
-    table.className = 'min-w-full divide-y divide-gray-200';
-    this.data.forEach((row, rowIndex) => {
+    table.className = 'table-auto w-full border-collapse border border-gray-300';
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    this.headers.forEach(header => {
+      const th = document.createElement('th');
+      th.className = 'border border-gray-300 px-4 py-2 bg-gray-100';
+      th.innerText = header;
+      headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    this.data.forEach(row => {
       const tr = document.createElement('tr');
-      row.forEach((cell, colIndex) => {
+      this.headers.forEach(header => {
         const td = document.createElement('td');
-        td.className = 'border px-2 py-1';
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = cell;
-        input.className = 'w-full';
-        input.addEventListener('blur', () => {
-          this.data[rowIndex][colIndex] = input.value;
-          if (this.onDataChange) this.onDataChange(this.data);
-        });
-        td.appendChild(input);
+        td.className = 'border border-gray-300 px-4 py-2 text-sm';
+        td.innerText = row[header] || '';
         tr.appendChild(td);
       });
-      table.appendChild(tr);
+      tbody.appendChild(tr);
     });
+
+    table.appendChild(tbody);
     this.container.appendChild(table);
-  }
-
-  getElement() {
-    return this.container;
-  }
-
-  setData(newData) {
-    this.data = newData;
-    this.render();
   }
 }
