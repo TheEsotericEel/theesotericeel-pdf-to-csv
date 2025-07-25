@@ -60,3 +60,19 @@ export async function renderPagesToCanvases(pdf, scale = 2.0) {
   }
   return canvases;
 }
+
+
+// Alias functions for compatibility with components
+export async function isTextPdf(pdf) {
+  return await isPdfTextBased(pdf);
+}
+
+export async function extractText(pdf) {
+  return await extractTextFromPdf(pdf);
+}
+
+export async function getPdfPageCanvases(pdf, startPage = 1, endPage = pdf.numPages, scale = 2.0) {
+  const canvases = await renderPagesToCanvases(pdf, scale);
+  const end = Math.min(endPage, canvases.length);
+  return canvases.slice(startPage - 1, end);
+}
